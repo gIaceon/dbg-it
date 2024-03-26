@@ -1,0 +1,55 @@
+import { Command } from "../class/cmd";
+import { BaseRegistry } from "../class/regBase";
+import { CommandGroups } from "../enum";
+import { Builder } from "../impl/builder";
+import { CommandCtx, CommandDef } from "../types";
+import { ArgumentBuilder, ExtractTupleFromArgBuilder, ExtractTypeFromTupleArg } from "./type";
+
+export class CommandBuilder<G extends [...unknown[]] = []> extends Builder<Command<G>> {
+	protected arguments?: ArgumentBuilder<G>;
+	private exec?: (ctx: CommandCtx, ...args: G) => string | undefined | void;
+	protected constructor(
+		private definition: Partial<CommandDef>,
+		private registry: BaseRegistry,
+	) {
+		super();
+	}
+
+	public name(name: string) {
+		this.definition.Name = name;
+		return this;
+	}
+
+	public group(group: CommandGroups) {
+		this.definition.Group = group;
+		return this;
+	}
+
+	public desc(desc: string) {
+		this.definition.Description = desc;
+		return this;
+	}
+
+	public setArguments<S extends ArgumentBuilder<[...unknown[]]>>(
+		args: S,
+	): CommandBuilder<ExtractTupleFromArgBuilder<S>> {
+		this.arguments = args;
+		return this as never;
+	}
+
+	public executes(exec: (ctx: CommandCtx, ...args: G) => string | undefined | void) {
+		this.exec = exec;
+		return this;
+	}
+
+	public build() {
+		this.definition.Arguments = this.arguments === undefined ? [] : this.arguments.build();
+		return Command.fromDef(this.definition as CommandDef, this.registry)
+			.injectExecMethod(this.exec as never)
+			.injectArguments(this.arguments) as never as Command<G>;
+	}
+
+	public static create(registry: BaseRegistry) {
+		return new CommandBuilder({}, registry);
+	}
+}

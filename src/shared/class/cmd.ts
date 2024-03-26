@@ -1,0 +1,49 @@
+import { ArgumentBuilder, ExtractTupleFromArgBuilder } from "../datagen/type";
+import { CommandGroups } from "../enum";
+import { CommandCtx, CommandDef } from "../types";
+import { BaseRegistry } from "./regBase";
+
+export class Command<A extends [...unknown[]] = unknown[]> {
+	protected exec?: (ctx: CommandCtx, ...args: A) => string | undefined | void;
+	protected args?: ArgumentBuilder<unknown[]>;
+	protected constructor(
+		private readonly definition: Readonly<CommandDef>,
+		private readonly registry: BaseRegistry,
+	) {}
+
+	public injectExecMethod(exec?: (ctx: CommandCtx, ...args: A) => string | undefined | void) {
+		this.exec = exec;
+		return this;
+	}
+
+	public injectArguments<T extends ArgumentBuilder<[...unknown[]]>>(args?: T) {
+		this.args = args;
+		return this as never as Command<ExtractTupleFromArgBuilder<T>>;
+	}
+
+	public register() {
+		if (this.args) this.registry.registerTypesFromArgs(this.args);
+		this.registry.registerCommand(this);
+		return this;
+	}
+
+	public run(ctx: CommandCtx, ...args: A) {
+		return this.exec !== undefined ? this.exec(ctx, ...args) : undefined;
+	}
+
+	public getDef(): Readonly<CommandDef> {
+		return this.definition;
+	}
+
+	public getArgs(): ArgumentBuilder<A> | undefined {
+		return this.args;
+	}
+
+	public static fromDef(definition: CommandDef, reg: BaseRegistry) {
+		return new Command({ ...definition }, reg);
+	}
+
+	public static empty(reg: BaseRegistry) {
+		return new Command({ Name: "", Arguments: [], Group: CommandGroups.Misc }, reg);
+	}
+}
