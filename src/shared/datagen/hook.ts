@@ -21,6 +21,7 @@ export class HookBuilder extends Builder<HookDef> {
 		this.registry.registerHook(this);
 		return this;
 	}
+	/** @hidden */
 	public build(): HookDef {
 		return this.definition as HookDef;
 	}

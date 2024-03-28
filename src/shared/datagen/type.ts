@@ -17,17 +17,22 @@ export type TupleToType<T extends [...unknown[]]> = { [K in keyof T]: Type<T[K]>
 
 export class ArgumentBuilder<T extends [...unknown[]] = []> extends Builder<TypeDef[]> {
 	protected arguments: Type<unknown>[] = [];
-	protected constructor(private definition: Partial<TypeDef[]>) {
+	protected constructor(private definition: Partial<TypeDef>[]) {
 		super();
 	}
 	public addArgument<A extends Type<unknown>>(arg: A): ArgumentBuilder<[...T, ExtractTypeFromType<A>]> {
 		this.arguments.push(arg);
 		return this as never;
 	}
+	/** @hidden */
 	public getArguments() {
 		return this.arguments as ReadonlyArray<Type<unknown>>;
 	}
+	/** @hidden */
 	public build() {
+		this.arguments.forEach((v, i) => {
+			this.definition.push({ Name: `arg_${i}`, Type: v.getName() });
+		});
 		return this.definition as TypeDef[];
 	}
 	public static create() {
