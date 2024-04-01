@@ -48,7 +48,9 @@ export class StringsType extends CSVType<string> {
 
 export class NumberType extends Type<number> {
 	public transform(value: unknown): number | undefined {
-		return tonumber(value);
+		// Only allow digits and "." to prevent things like tonumber("nan") and tonumber("1e+...")
+		// TODO: Consider an UnsafeNumber type which does not do this.
+		return tonumber(tostring(value).gsub("[^%d.]+", "")[0]);
 	}
 	public validate(value: unknown): value is number {
 		return t.number(value);
@@ -63,6 +65,28 @@ export class NumbersType extends CSVType<number> {
 	protected check = t.number;
 	public static create() {
 		return new NumbersType("numbers");
+	}
+}
+
+export class IntType extends Type<number> {
+	public transform(value: unknown, ctx: CommandCtx): number | undefined {
+		const transformed = NumberType.create().transform(value);
+		if (transformed === undefined) return;
+		return math.floor(transformed);
+	}
+	public validate(value: unknown): value is number {
+		return t.integer(value);
+	}
+	public static create() {
+		return new IntType("int");
+	}
+}
+
+export class IntsType extends CSVType<number> {
+	protected baseType = IntType.create();
+	protected check = t.integer;
+	public static create() {
+		return new IntsType("ints");
 	}
 }
 

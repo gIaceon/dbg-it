@@ -1,8 +1,16 @@
 import { LogLevel } from "@rbxts/log";
-import { ArgumentBuilder, CommandBuilder, CommandGroups, EnumType, StringType } from "../shared";
+import { ArgumentBuilder, CommandBuilder, CommandGroups, EnumType, NumberType, StringType } from "../shared";
 import { BaseRegistry } from "../shared/class/regBase";
 
 export function registerBuiltins(reg: BaseRegistry) {
+	CommandBuilder.create(reg)
+		.name("cmds")
+		.group(CommandGroups.Misc)
+		.desc("Lists all commands and their arguments.\nSeperated into pages, with 10 commands per page.")
+		.setArguments(ArgumentBuilder.create().addOptionalArgument(NumberType.create()))
+		.executes((ctx, idx = 1) => reg.getCmdsPage(idx))
+		.build()
+		.register();
 	CommandBuilder.create(reg)
 		.name("echo")
 		.group(CommandGroups.Debug)

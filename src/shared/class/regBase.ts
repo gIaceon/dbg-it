@@ -6,6 +6,9 @@ import { TypeDef } from "../types";
 import { DbgIt } from "./dbgItBase";
 import { HookBuilder } from "../datagen/hook";
 import { HookInjectPoints } from "../enum";
+import { paginate } from "../util/paginate";
+
+const CMDS_PAGE_ELEM_COUNT = 10;
 
 export abstract class BaseRegistry {
 	protected clientReciever = remotes.fetchCommandMetadata;
@@ -47,5 +50,27 @@ export abstract class BaseRegistry {
 
 	public getTypes(): ReadonlyMap<string, Type<unknown>> {
 		return this.types;
+	}
+
+	public getCmdsPage(page: number) {
+		// TODO Commands are not in order of registry.
+		// TODO: Performance may not be the best here with large amounts of commands.
+		const commandsArr: Command<unknown[]>[] = [];
+		this.commands.forEach((v) => commandsArr.push(v));
+		return paginate(
+			commandsArr.mapFiltered(
+				(v) =>
+					`${v.getDef().Name}: ${
+						// For optional arguments: add a "?" after the type name
+						v
+							.getArgs()
+							?.getArgumentDef()
+							.mapFiltered((v) => `${v.Type.getName()}${v.Optional ? "?" : ""}`)
+							.join() ?? ""
+					} (${v.getDef().Description?.gsub("\n", " ")[0]})`,
+			),
+			page,
+			CMDS_PAGE_ELEM_COUNT,
+		);
 	}
 }

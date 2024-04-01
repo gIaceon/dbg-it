@@ -9,6 +9,8 @@ export interface CommandDef {
 export interface TypeDef {
 	Name: string;
 	Type: string;
+	Optional?: boolean;
+	// Default?: string;
 }
 export interface CommandCtx {
 	RawCommandString: string;

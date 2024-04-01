@@ -30,10 +30,10 @@ export class CommandBuilder<G extends [...unknown[]] = []> extends Builder<Comma
 		return this;
 	}
 
-	public setArguments<S extends ArgumentBuilder<[...unknown[]]>>(
-		args: S,
-	): CommandBuilder<ExtractTupleFromArgBuilder<S>> {
-		this.arguments = args;
+	public setArguments<
+		S extends ArgumentBuilder<[...unknown[]]> | Omit<ArgumentBuilder<[...unknown[]]>, "addArgument">,
+	>(args: S): CommandBuilder<ExtractTupleFromArgBuilder<S>> {
+		this.arguments = args as never;
 		return this as never;
 	}
 

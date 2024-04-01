@@ -40,8 +40,37 @@ export abstract class BaseExec {
 			if (currentArgument.validate(result)) return result;
 			throw `Invalid argument ${v} (expected ${currentArgument.getName()})`;
 		});
-		if (command.getArgs() && split.size() < command.getArgs()!.getArguments().size())
-			throw `Expected ${command.getArgs()?.getArguments().size()} arguments, got ${split.size()}`;
+		// We now need to remove all optional ending arguments from the array to ensure the size is correct.
+		if (
+			command.getArgs() &&
+			split.size() <
+				command
+					.getArgs()!
+					.getArgumentDef()
+					.mapFiltered((v) => (v.Optional ? undefined : v))
+					.size()
+		) {
+			throw `Expected ${
+				command
+					.getArgs()
+					?.getArgumentDef()
+					.mapFiltered((v) => v.Optional)
+					.reduce((accumulator, isOptional) => {
+						// Determine if any arguments of the array are optional
+						if (accumulator === true) return accumulator;
+						return isOptional;
+					})
+					? "at least "
+					: ""
+			}${
+				command
+					.getArgs()
+					?.getArgumentDef()
+					.mapFiltered((v) => (v.Optional ? undefined : v))
+					.size() ?? 0
+			} argument(s), got ${split.size()}`;
+		}
+
 		this.runHooksOf(HookInjectPoints.BeforeExecution, ctx).expect();
 		const result = command.run(ctx, ...args);
 		this.runHooksOf(HookInjectPoints.AfterExecution, ctx).expect();
