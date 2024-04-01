@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/dbg-it",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Simple and extensible debugging utility.",
   "main": "out/init.lua",
   "scripts": {
