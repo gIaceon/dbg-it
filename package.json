@@ -20,6 +20,10 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gIaceon/dbg-it.git"
+  },
   "devDependencies": {
     "@rbxts/compiler-types": "^2.3.0-types.0",
     "@rbxts/types": "^1.0.765",
