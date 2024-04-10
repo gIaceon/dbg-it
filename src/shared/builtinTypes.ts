@@ -175,3 +175,23 @@ export class EnumsType<T extends someEnum> extends CSVType<T[keyof T]> {
 		return new EnumsType(enumeration, name);
 	}
 }
+
+export class StringLiteralType<T extends string> extends Type<T> {
+	constructor(
+		private readonly values: [...T[]],
+		name: string,
+	) {
+		super(name);
+	}
+	transform(value: unknown, ctx: CommandCtx): T | undefined {
+		const asStr = tostring(value);
+		if (this.values.indexOf(asStr as T) >= 0) return asStr as never;
+		return undefined;
+	}
+	validate(value: unknown): value is T {
+		return t.literal<[...T[]]>(...this.values)(tostring(value));
+	}
+	public static create<T extends string>(name: string, ...values: [...T[]]) {
+		return new StringLiteralType(values, name);
+	}
+}
