@@ -7,7 +7,7 @@
     "build": "rbxtsc",
     "dev": "rbxtsc -w --type=game",
     "watch": "rbxtsc -w",
-    "prepublishOnly": "rbxtsc"
+    "prepare": "rbxtsc"
   },
   "keywords": [],
   "author": "gIaceon",
