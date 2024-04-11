@@ -23,7 +23,6 @@ export class Command<A extends [...unknown[]] = unknown[]> {
 		return this as never as Command<ExtractTupleFromArgBuilder<T>>;
 	}
 
-	/** @hidden */
 	public register() {
 		if (this.args) this.registry.registerTypesFromArgs(this.args);
 		this.registry.registerCommand(this);
