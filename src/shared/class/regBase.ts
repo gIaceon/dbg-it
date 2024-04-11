@@ -11,7 +11,6 @@ import { paginate } from "../util/paginate";
 const CMDS_PAGE_ELEM_COUNT = 10;
 
 export abstract class BaseRegistry {
-	protected clientReciever = remotes.fetchCommandMetadata;
 	protected commands: Map<string, Command<unknown[]>> = new Map();
 	protected types: Map<string, Type<unknown>> = new Map();
 	protected typeDefs: Map<string, TypeDef> = new Map();

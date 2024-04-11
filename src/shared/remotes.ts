@@ -1,14 +1,10 @@
-import { Server, createRemotes, remote, throttleMiddleware } from "@rbxts/remo";
-import { CommandDef } from "./types";
-import { $terrify } from "rbxts-transformer-t-new";
+import { Server, createRemotes, remote } from "@rbxts/remo";
 import { t } from "@rbxts/t";
+import { $terrify } from "rbxts-transformer-t-new";
+import { ServerExecutionResult } from "./types";
 
 export const remotes = createRemotes({
-	fetchCommandMetadata: remote<Server>()
-		.returns(t.array<CommandDef>($terrify<CommandDef>()))
-		.middleware(
-			throttleMiddleware({
-				throttle: 1,
-			}),
-		),
+	executeCommand: remote<Server, [commandArgs: string]>(t.string).returns<ServerExecutionResult>(
+		$terrify<ServerExecutionResult>(),
+	),
 });

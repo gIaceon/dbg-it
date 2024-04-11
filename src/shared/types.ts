@@ -24,3 +24,7 @@ export interface HookDef {
 	InjectionPoint: HookInjectPoints;
 	HookName: string;
 }
+export interface ServerExecutionResult {
+	success: boolean;
+	result: string | void | undefined;
+}
