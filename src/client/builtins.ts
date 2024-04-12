@@ -1,6 +1,6 @@
 import { LogLevel } from "@rbxts/log";
 import { ArgumentBuilder, CommandBuilder, CommandGroups, EnumType, NumberType, StringType } from "../shared";
-import { BaseRegistry } from "../shared/class/regBase";
+import { BaseRegistry } from "../shared/class/registry";
 
 export function registerBuiltins(reg: BaseRegistry) {
 	CommandBuilder.create(reg)

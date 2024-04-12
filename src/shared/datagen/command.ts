@@ -1,5 +1,6 @@
+import { RunService } from "@rbxts/services";
 import { Command } from "../class/cmd";
-import { BaseRegistry } from "../class/regBase";
+import { BaseRegistry } from "../class/registry";
 import { CommandGroups } from "../enum";
 import { Builder } from "../impl/builder";
 import { CommandCtx, CommandDef } from "../types";
@@ -13,6 +14,7 @@ export class CommandBuilder<G extends [...unknown[]] = []> extends Builder<Comma
 		private registry: BaseRegistry,
 	) {
 		super();
+		this.definition.IsServer = RunService.IsServer();
 	}
 
 	public name(name: string) {

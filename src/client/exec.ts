@@ -2,6 +2,7 @@ import { DbgIt } from "../shared";
 import { BaseExec } from "../shared/class/exec";
 import { remotes } from "../shared/remotes";
 import { splitString } from "../shared/util/str";
+import { ClientReplicator } from "./replicator";
 
 export class ExecClient extends BaseExec {
 	public constructor(dbgit: DbgIt) {
@@ -11,7 +12,10 @@ export class ExecClient extends BaseExec {
 		return new Promise((resolve, reject) => {
 			const split = splitString(commandString, "%s");
 			const commandName = split[0];
-			if (this.dbgit.registry.getCommands().has(commandName) === false) {
+			if (
+				this.dbgit.registry.getCommands().has(commandName) === false &&
+				(this.dbgit.replicator as ClientReplicator).commandExists(commandName)
+			) {
 				const { success, result } = remotes.executeCommand(commandString).expect();
 				if (!success) reject(tostring(result ?? "Unknown error!"));
 				return resolve(result);

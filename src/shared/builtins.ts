@@ -1,5 +1,5 @@
 import { NumbersType } from "./builtinTypes";
-import { BaseRegistry } from "./class/regBase";
+import { BaseRegistry } from "./class/registry";
 import { ArgumentBuilder, CommandBuilder } from "./datagen";
 import { CommandGroups } from "./enum";
 

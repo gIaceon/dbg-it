@@ -63,9 +63,11 @@ export class ArgumentBuilder<T extends [...unknown[]] = []> extends Builder<Type
 	}
 	/** @hidden */
 	public build() {
-		this.arguments.forEach((v, i) => {
-			this.definition.push({ Name: `arg_${i}`, Type: v.Type.getName(), Optional: v.Optional });
-		});
+		this.definition = this.arguments.mapFiltered((v, i) => ({
+			Name: `arg_${i}`,
+			Type: v.Type.getName(),
+			Optional: v.Optional,
+		}));
 		return this.definition as TypeDef[];
 	}
 	public static create() {

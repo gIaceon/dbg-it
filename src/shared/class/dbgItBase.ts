@@ -2,9 +2,10 @@ import Log, { Logger } from "@rbxts/log";
 import { DbgItLoggingSink } from "./logging";
 import { ILogEventSink, LogLevel } from "@rbxts/log/out/Core";
 import { toStr } from "../impl/tostr";
-import { BaseRegistry } from "./regBase";
+import { BaseRegistry } from "./registry";
 import { BaseExec } from "./exec";
 import { registerBuiltins } from "../builtins";
+import { BaseReplicator } from "./replicator";
 
 export interface logType {
 	level: LogLevel;
@@ -18,6 +19,7 @@ export abstract class DbgIt implements toStr {
 	public messageHistory: logType[] = [];
 	public abstract registry: BaseRegistry;
 	public abstract exec: BaseExec;
+	public abstract replicator: BaseReplicator;
 	protected constructor() {}
 
 	public configureLogging<S extends ILogEventSink>(

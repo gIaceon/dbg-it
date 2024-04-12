@@ -5,6 +5,7 @@ export interface CommandDef {
 	Group: CommandGroups;
 	Description?: string;
 	Arguments: TypeDef[];
+	IsServer: boolean;
 }
 export interface TypeDef {
 	Name: string;

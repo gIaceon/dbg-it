@@ -2,10 +2,10 @@ import { remotes } from "../remotes";
 import { Type } from "./type";
 import { Command } from "./cmd";
 import { ArgumentBuilder } from "../datagen/type";
-import { TypeDef } from "../types";
+import { CommandDef, TypeDef } from "../types";
 import { DbgIt } from "./dbgItBase";
 import { HookBuilder } from "../datagen/hook";
-import { HookInjectPoints } from "../enum";
+import { CommandGroups, HookInjectPoints } from "../enum";
 import { paginate } from "../util/paginate";
 
 const CMDS_PAGE_ELEM_COUNT = 10;
@@ -52,21 +52,19 @@ export abstract class BaseRegistry {
 	}
 
 	public getCmdsPage(page: number) {
-		// TODO Commands are not in order of registry.
-		// TODO: Performance may not be the best here with large amounts of commands.
-		const commandsArr: Command<unknown[]>[] = [];
-		this.commands.forEach((v) => commandsArr.push(v));
+		const commandsArr: CommandDef[] = [];
+		this.commands.forEach((v) => commandsArr.push(v.getDef()));
+		this.dbgit.replicator.getReplicatedCommands().forEach((v) => commandsArr.push(v));
 		return paginate(
 			commandsArr.mapFiltered(
 				(v) =>
-					`${v.getDef().Name}: ${
-						// For optional arguments: add a "?" after the type name
-						v
-							.getArgs()
-							?.getArgumentDef()
-							.mapFiltered((v) => `${v.Type.getName()}${v.Optional ? "?" : ""}`)
-							.join() ?? ""
-					} (${v.getDef().Description?.gsub("\n", " ")[0]})`,
+					`${v.IsServer ? "*" : ""}${v.Name} [${CommandGroups[v.Group] ?? `Custom<${v.Group}>`}] -${
+						v.Arguments.size() > 0
+							? " (" +
+								(v.Arguments.mapFiltered((v) => `${v.Type}${v.Optional ? "?" : ""}`).join() ?? "") +
+								") "
+							: ""
+					}${v.Description === undefined ? "" : ` ${v.Description.gsub("\n", " ")[0]}`}`,
 			),
 			page,
 			CMDS_PAGE_ELEM_COUNT,

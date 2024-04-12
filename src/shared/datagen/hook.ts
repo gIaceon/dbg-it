@@ -1,4 +1,4 @@
-import { BaseRegistry } from "../class/regBase";
+import { BaseRegistry } from "../class/registry";
 import { HookInjectPoints } from "../enum";
 import { Builder } from "../impl/builder";
 import { CommandCtx, HookDef } from "../types";

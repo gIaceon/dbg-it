@@ -147,7 +147,6 @@ export class EnumType<T extends someEnum> extends Type<T[keyof T]> {
 		super(enumName);
 	}
 	public transform(value: unknown): T[keyof T] | undefined {
-		// print(this.enumKeys);
 		const asStr = tostring(value);
 		if (this.enumKeys.includes(asStr as keyof T)) return this.enumeration[asStr as keyof T];
 	}

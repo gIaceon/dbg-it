@@ -1,7 +1,8 @@
+import { RunService } from "@rbxts/services";
 import { ArgumentBuilder, ExtractTupleFromArgBuilder } from "../datagen/type";
 import { CommandGroups } from "../enum";
 import { CommandCtx, CommandDef } from "../types";
-import { BaseRegistry } from "./regBase";
+import { BaseRegistry } from "./registry";
 
 export class Command<A extends [...unknown[]] = unknown[]> {
 	protected exec?: (ctx: CommandCtx, ...args: A) => string | undefined | void;
@@ -49,6 +50,9 @@ export class Command<A extends [...unknown[]] = unknown[]> {
 
 	/** @hidden */
 	public static empty(reg: BaseRegistry) {
-		return new Command({ Name: "", Arguments: [], Group: CommandGroups.Misc }, reg);
+		return new Command(
+			{ Name: "", Arguments: [], Group: CommandGroups.Misc, IsServer: RunService.IsServer() },
+			reg,
+		);
 	}
 }
