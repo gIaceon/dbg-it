@@ -1,12 +1,16 @@
 import { ILogEventSink, LogEvent, LogLevel } from "@rbxts/log/out/Core";
 import { MessageTemplateParser, PlainTextMessageTemplateRenderer } from "@rbxts/message-templates";
 
-interface DbgItLogOptions {
-	logMiddleware: (severity: LogLevel, time: string | undefined, message: string) => void;
-}
+const MESSAGE_HISTORY_MAX = 1000;
+
+export type LoggingMiddleware = (severity: LogLevel, time: string | undefined, message: string) => void;
 
 export class DbgItLoggingSink implements ILogEventSink {
-	constructor(private readonly options: DbgItLogOptions = { logMiddleware: () => {} }) {}
+	private history: { severity: LogLevel; time: string | undefined; message: string }[] = [];
+	private middleware: LoggingMiddleware[];
+	constructor(...middleware: LoggingMiddleware[]) {
+		this.middleware = middleware;
+	}
 	Emit(message: LogEvent): void {
 		const template = new PlainTextMessageTemplateRenderer(MessageTemplateParser.GetTokens(message.Template));
 		const time = DateTime.fromIsoDate(message.Timestamp)?.FormatLocalTime("HH:mm:ss", "en-us");
@@ -36,7 +40,21 @@ export class DbgItLoggingSink implements ILogEventSink {
 		}
 		const renderedMessage = template.Render(message);
 		const formattedMessage = `[${tag!}]: ${renderedMessage}`;
-		this.options.logMiddleware(message.Level, time, formattedMessage);
-		warn(formattedMessage);
+		this.middleware.forEach((mw) => coroutine.wrap(mw)(message.Level, time, formattedMessage));
+		this.history.push({
+			severity: message.Level,
+			time: time,
+			message: formattedMessage,
+		});
+		this.history = this.history.filter(
+			(_, i) => this.history.size() > MESSAGE_HISTORY_MAX && i <= this.history.size() - MESSAGE_HISTORY_MAX,
+		);
+	}
+	public addMiddleware(mw: LoggingMiddleware) {
+		this.history.forEach((v) => coroutine.wrap(mw)(v.severity, v.time, v.message));
+		this.middleware.push(mw);
+	}
+	public getMessageHistory() {
+		return this.history;
 	}
 }

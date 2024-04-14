@@ -15,22 +15,18 @@ export interface logType {
 }
 
 export abstract class DbgIt implements toStr {
-	public LogSink = DbgItLoggingSink;
-	public Logger: Logger = Log.Default();
+	public LogSink = new DbgItLoggingSink();
+	public Logger: Logger = Log.Configure()
+		.WriteTo({ Emit(message) {} })
+		.Create();
 	public messageHistory: logType[] = [];
 	public abstract registry: BaseRegistry;
 	public abstract exec: BaseExec;
 	public abstract replicator: BaseReplicator;
 	protected constructor() {}
 
-	public configureLogging<S extends ILogEventSink>(
-		customSink: S = new this.LogSink({
-			logMiddleware: (level, time, message) =>
-				this.messageHistory.push({ level: level, time: time, message: message }),
-		}) as never,
-		configure?: (sink: Omit<S, "Emit">) => void,
-	) {
-		this.Logger = Log.Configure().WriteTo(customSink, configure).Create();
+	public configureLogging(configure: (sink: Omit<DbgItLoggingSink, "Emit">) => void = () => {}) {
+		this.Logger = Log.Configure().WriteTo(this.LogSink, configure).Create();
 	}
 
 	public abstract toString(): string;
