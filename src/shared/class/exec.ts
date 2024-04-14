@@ -22,21 +22,43 @@ export abstract class BaseExec {
 
 	public execute(commandString: string, executor: Player): Promise<string | void | undefined> {
 		return new Promise((resolve, reject) => {
-			const split = splitString(commandString, "%s");
-			const commandName = split[0];
+			// Replace all inline commands so the server doesn't try to execute client commands
+			let possibleErr: string | undefined;
+			const inlineResults: { [idx: string]: string } = {};
+			for (const tup of string.gmatch(commandString, "$(%b{})")) {
+				let result = "";
+				const [txt] = tup;
+				if (typeIs(txt, "number")) continue;
+				this.execute(txt.sub(2, txt.size() - 1), executor)
+					.then((res) => (result = res === undefined ? "" : res))
+					.catch((err) => (possibleErr = `Inline command failed: ${err}`))
+					.await();
+				if (result.find("%s").size() > 0) result = `"${result}"`;
+				inlineResults[txt] = result;
+			}
+			if (possibleErr !== undefined) return reject(possibleErr);
+			[commandString] = string.gsub(commandString, "$(%b{})", inlineResults);
+			const tokens = splitString(commandString, "%s");
+			const commandName = tokens[0];
+			// Replace all inline commands so the server doesn't try to execute client commands
+			tokens.mapFiltered((v) => {
+				if (possibleErr !== undefined) return undefined;
+
+				return v;
+			});
+			if (possibleErr !== undefined) return reject(possibleErr);
 			if (!this.dbgit.registry.getCommands().has(commandName)) return reject(`No command ${commandName}`);
 			const command = this.dbgit.registry.getCommands().get(commandName)!;
-			split.remove(0);
+			tokens.remove(0); // Remove the command name from the tokens
 			const ctx: CommandCtx = {
 				Executor: executor,
 				RawCommandString: commandString,
-				RawArguments: split,
+				RawArguments: tokens,
 				CommandName: commandName,
 				Group: command.getDef().Group,
 				CommandDefinition: command.getDef(),
 			};
-			let possibleErr: string | undefined;
-			const args = split.mapFiltered((v, i) => {
+			const args = tokens.mapFiltered((v, i) => {
 				if (possibleErr !== undefined) return undefined;
 				if (command.getArgs() === undefined) return undefined;
 				const currentArgument = command.getArgs()!.getArguments()[i];
@@ -49,7 +71,7 @@ export abstract class BaseExec {
 			// We now need to remove all optional ending arguments from the array to ensure the size is correct.
 			if (
 				command.getArgs() &&
-				split.size() <
+				tokens.size() <
 					command
 						.getArgs()!
 						.getArgumentDef()
@@ -75,7 +97,7 @@ export abstract class BaseExec {
 							?.getArgumentDef()
 							.mapFiltered((v) => (v.Optional ? undefined : v))
 							.size() ?? 0
-					} argument(s), got ${split.size()}`,
+					} argument(s), got ${tokens.size()}`,
 				);
 			}
 
@@ -92,6 +114,7 @@ export abstract class BaseExec {
 				.catch((e: string) => (err = e))
 				.await();
 			if (err !== undefined) return reject(err);
+
 			return resolve(result);
 		});
 	}

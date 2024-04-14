@@ -10,14 +10,31 @@ export class ExecClient extends BaseExec {
 	}
 	public execute(commandString: string): ReturnType<BaseExec["execute"]> {
 		return new Promise((resolve, reject) => {
-			const split = splitString(commandString, "%s");
-			const commandName = split[0];
+			// Replace all inline commands so the server doesn't try to execute client commands
+			let possibleErr: string | undefined;
+			const inlineResults: { [idx: string]: string } = {};
+			for (const tup of string.gmatch(commandString, "$(%b{})")) {
+				let result = "";
+				const [txt] = tup;
+				if (typeIs(txt, "number")) continue;
+				this.execute(txt.sub(2, txt.size() - 1))
+					.then((res) => (result = res === undefined ? "" : res))
+					.catch((err) => (possibleErr = `Inline command failed: ${err}`))
+					.await();
+				if (result.find("%s").size() > 0) result = `"${result}"`;
+				inlineResults[txt] = result;
+			}
+			if (possibleErr !== undefined) return reject(possibleErr);
+			[commandString] = string.gsub(commandString, "$(%b{})", inlineResults);
+			const tokens = splitString(commandString, "%s");
+			const commandName = tokens[0];
+			// If there is no command registered with that name and we have a replicated command with that name...
 			if (
 				this.dbgit.registry.getCommands().has(commandName) === false &&
 				(this.dbgit.replicator as ClientReplicator).commandExists(commandName)
 			) {
 				const { success, result } = remotes.executeCommand(commandString).expect();
-				if (!success) reject(tostring(result ?? "Unknown error!"));
+				if (!success) reject(tostring(result ?? "Remote execution failed"));
 				return resolve(result);
 			}
 			let result: string | void | undefined = undefined;
