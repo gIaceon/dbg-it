@@ -4,8 +4,16 @@ import { ServerRegistry } from "./registry";
 import { ServerReplicator } from "./replicator";
 
 export const DbgItServer = new (class extends DbgIt {
+	/**
+	 * Handles registration of commands, types, and hooks.
+	 */
 	public registry = new ServerRegistry(this as DbgIt);
-	public exec = new ExecServer(this as DbgIt);
+	/**
+	 * Handles execution of commands.
+	 */
+	public executor = new ExecServer(this as DbgIt);
+
+	/** @hidden */
 	public replicator = new ServerReplicator(this as DbgIt);
 
 	public constructor() {

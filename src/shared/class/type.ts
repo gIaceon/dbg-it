@@ -1,6 +1,9 @@
 import { CommandCtx } from "../types";
 
-/** Base class to convert a token into a type */
+/**
+ * A utility class to safely convert data (usually strings) into another type.
+ * @abstract
+ */
 export abstract class Type<S> {
 	protected constructor(private name: string) {}
 	public abstract transform(value: unknown, ctx: CommandCtx): S | undefined;

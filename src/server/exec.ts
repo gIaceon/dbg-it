@@ -2,6 +2,9 @@ import { DbgIt } from "../shared";
 import { BaseExec } from "../shared/class/exec";
 import { remotes } from "../shared/remotes";
 
+/**
+ * Handles execution of commands.
+ */
 export class ExecServer extends BaseExec {
 	public constructor(dbgit: DbgIt) {
 		super(dbgit);

@@ -10,8 +10,8 @@ export function getBuiltins(reg: BaseRegistry): Command<[...unknown[]]>[] {
 			.name("cmds")
 			.group(CommandGroups.Misc)
 			.desc("Lists all commands and their arguments.\nSeperated into pages, with 10 commands per page.")
-			.setArguments(ArgumentBuilder.create().addOptionalArgument(NumberType.create()))
-			.executes((ctx, idx = 1) => reg.getCmdsPage(idx))
+			.setArguments(ArgumentBuilder.create().appendOptionalArgument(NumberType.create()))
+			.executes((ctx, idx = 1) => reg.helpPage(idx))
 			.build(),
 		CommandBuilder.create(reg)
 			.name("whoami")

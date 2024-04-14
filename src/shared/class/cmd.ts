@@ -24,6 +24,11 @@ export class Command<A extends [...unknown[]] = unknown[]> {
 		return this as never as Command<ExtractTupleFromArgBuilder<T>>;
 	}
 
+	/**
+	 * Registers this command to the registry.
+	 * @see {@link BaseRegistry}
+	 * @returns This command.
+	 */
 	public register() {
 		if (this.args) this.registry.registerTypesFromArgs(this.args);
 		this.registry.registerCommand(this);
@@ -35,10 +40,18 @@ export class Command<A extends [...unknown[]] = unknown[]> {
 		return this.exec !== undefined ? this.exec(ctx, ...args) : undefined;
 	}
 
+	/**
+	 * Returns a serializable, readonly command definition.
+	 * @returns Command definition
+	 */
 	public getDef(): Readonly<CommandDef> {
 		return this.definition;
 	}
 
+	/**
+	 * Returns the ArgumentBuilder for this command.
+	 * @returns ArgumentBuilder for this command
+	 */
 	public getArgs(): ArgumentBuilder<A> | undefined {
 		return this.args;
 	}

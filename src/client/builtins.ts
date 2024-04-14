@@ -9,7 +9,7 @@ export function getBuiltins(reg: BaseRegistry): Command<[...unknown[]]>[] {
 			.name("echo")
 			.group(CommandGroups.Debug)
 			.desc("Echo command")
-			.setArguments(ArgumentBuilder.create().addArgument(StringType.create()))
+			.setArguments(ArgumentBuilder.create().appendArgument(StringType.create()))
 			.executes((ctx, _) => {
 				return ctx.RawArguments.join(" ");
 			})
@@ -20,8 +20,8 @@ export function getBuiltins(reg: BaseRegistry): Command<[...unknown[]]>[] {
 			.desc("Logs to the logger")
 			.setArguments(
 				ArgumentBuilder.create()
-					.addArgument(EnumType.create(LogLevel, "logLevel"))
-					.addArgument(StringType.create()),
+					.appendArgument(EnumType.create(LogLevel, "logLevel"))
+					.appendArgument(StringType.create()),
 			)
 			.executes((ctx, level, _) => {
 				const log = reg.dbgit.Logger;
