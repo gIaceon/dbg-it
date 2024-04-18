@@ -1,4 +1,4 @@
-import { DbgIt, logType } from "../shared";
+import { DbgIt } from "../shared";
 import { Command } from "../shared/class/cmd";
 import { BaseReplicator } from "../shared/class/replicator";
 import { getBuiltins } from "./builtins";

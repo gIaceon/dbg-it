@@ -12,7 +12,7 @@ export class ExecClient extends BaseExec {
 		return new Promise((resolve, reject) => {
 			// Replace all inline commands so the server doesn't try to execute client commands
 			let possibleErr: string | undefined;
-			const inlineResults: { [idx: string]: string } = {};
+			const inlineResults: Record<string, string> = {};
 			for (const tup of string.gmatch(commandString, "$(%b{})")) {
 				let result = "";
 				const [txt] = tup;

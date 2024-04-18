@@ -1,44 +1,34 @@
-function charCode(n: string) {
-	return utf8.char(tonumber(n, 16) as number);
-}
-
-function parseEscapeSequences(text: string): string {
-	return text
-		.gsub("\\(.)", {
-			t: "\t",
-			n: "\n",
-		})[0]
-		.gsub("\\u(%x%x%x%x)", charCode)[0]
-		.gsub("\\x(%x%x)", charCode)[0];
-}
-
-function encodeControlChars(text: string) {
-	return text
-		.gsub("\\\\", "___!ESCAPE!___")[0]
-		.gsub('\\"', "___!QUOTE!___")[0]
-		.gsub("\\'", "___!SQUOTE!___")[0]
-		.gsub("\\\n", "___!NL!___")[0];
-}
-
-function decodeControlChars(text: string) {
-	return text.gsub("___!ESCAPE!___", "\\")[0].gsub("___!QUOTE!___", '"')[0].gsub("___!NL!___", "\n")[0];
-}
-
 const START_QUOTE_PATTERN = `^(['"])`;
 const END_QUOTE_PATTERN = `(['"])$`;
 const ESCAPE_PATTERN = `(\\*)['"]$`;
 
-/**
- * Splits a string by a given character, taking into account quoted sentences,
- * which will be treated as a single part instead of being split.
- *
- * @see https://github.com/evaera/Cmdr/blob/e3180638849a8615bb982bb74f970bf64435da63/Cmdr/Shared/Util.lua
- * @param text The text to split
- * @param separator The character to split by
- * @param max The max number of splits
- * @returns An array of strings, separated by the given character
- */
 export function splitString(text: string, separator: string, max = math.huge): string[] {
+	function charCode(n: string) {
+		return utf8.char(tonumber(n, 16) as number);
+	}
+
+	function parseEscapeSequences(text: string): string {
+		return text
+			.gsub("\\(.)", {
+				t: "\t",
+				n: "\n",
+			})[0]
+			.gsub("\\u(%x%x%x%x)", charCode)[0]
+			.gsub("\\x(%x%x)", charCode)[0];
+	}
+
+	function encodeControlChars(text: string) {
+		return text
+			.gsub("\\\\", "___!ESCAPE!___")[0]
+			.gsub('\\"', "___!QUOTE!___")[0]
+			.gsub("\\'", "___!SQUOTE!___")[0]
+			.gsub("\\\n", "___!NL!___")[0];
+	}
+
+	function decodeControlChars(text: string) {
+		return text.gsub("___!ESCAPE!___", "\\")[0].gsub("___!QUOTE!___", '"')[0].gsub("___!NL!___", "\n")[0];
+	}
+
 	const resultText = encodeControlChars(text);
 	const t: string[] = [];
 
@@ -80,12 +70,4 @@ export function splitString(text: string, separator: string, max = math.huge): s
 	}
 
 	return t;
-}
-
-export function endsWithSpace(text: string) {
-	return text.size() > 0 && text.match("%s$").size() > 0;
-}
-
-export function formatPartsAsPath(textParts: string[]) {
-	return textParts.join("/");
 }
