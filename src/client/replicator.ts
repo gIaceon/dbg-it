@@ -13,8 +13,8 @@ export class ClientReplicator extends BaseReplicator {
 		this.updateEntries();
 		remotes.rebuild.connect(() => this.updateEntries());
 	}
-	protected updateEntries() {
-		Log.Debug("Replication commands updated, rebuilding...");
+	public updateEntries() {
+		Log.Debug("Commands updated, rebuilding replicated commands state...");
 		this.commandMap.clear();
 		this.replicatedCommands = this.replicationRoot
 			.GetChildren()
@@ -26,8 +26,10 @@ export class ClientReplicator extends BaseReplicator {
 					if ($terrify<CommandDef>()(parsed)) result = parsed;
 					else Log.Error(`Failed to parse! ({})`, v);
 				});
-				if (result) this.commandMap.set(result.Name, result);
-				return result;
+				if (result !== undefined && !this.dbgit.registry.commandExists(result.Name)) {
+					this.commandMap.set(result.Name, result);
+					return result;
+				}
 			});
 	}
 
