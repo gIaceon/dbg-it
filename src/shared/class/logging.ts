@@ -22,7 +22,7 @@ export class DbgItLoggingSink implements ILogEventSink {
 		const tag = this.getSeverityLabel(message.Level);
 		const renderedMessage = template.Render(message);
 		const formattedMessage = `[${tag!}]: ${renderedMessage}`;
-		this.middleware.forEach((mw) => coroutine.wrap(mw)(message.Level, time, formattedMessage, message));
+		this.middleware.forEach((mw) => mw(message.Level, time, formattedMessage, message));
 		this.history.push({
 			severity: message.Level,
 			time: time,
@@ -61,7 +61,7 @@ export class DbgItLoggingSink implements ILogEventSink {
 		return tag;
 	}
 	public addMiddleware(mw: LoggingMiddleware) {
-		this.history.forEach((v) => coroutine.wrap(mw)(v.severity, v.time, v.message, v.event));
+		this.history.forEach((v) => mw(v.severity, v.time, v.message, v.event));
 		this.middleware.push(mw);
 	}
 	public getMessageHistory() {

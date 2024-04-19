@@ -49,7 +49,7 @@ export abstract class DbgIt implements toStr {
 	 * 	),
 	 * );
 	 * ```
-	 * Middleware should not yield, however if it does it will be run under a coroutine.
+	 * Middleware should not yield.
 	 * @param configure Function which passes in the {@link DbgItLoggingSink}, which can be used to add middleware.
 	 */
 	public configureLogging(configure: (sink: Omit<DbgItLoggingSink, "Emit">) => void = () => {}) {

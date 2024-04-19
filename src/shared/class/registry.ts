@@ -60,6 +60,10 @@ export abstract class BaseRegistry {
 		return this.types;
 	}
 
+	public commandExists(name: string) {
+		return this.commands.has(name);
+	}
+
 	/** @hidden */
 	public helpPage(page: number) {
 		const commandsArr: CommandDef[] = [];
