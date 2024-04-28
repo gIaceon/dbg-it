@@ -73,6 +73,11 @@ export class CommandBuilder<G extends [...unknown[]] = []> extends Builder<Comma
 	}
 
 	public static create(registry: BaseRegistry) {
-		return new CommandBuilder({}, registry);
+		return new CommandBuilder(
+			{
+				Group: CommandGroups.Unimplemented,
+			},
+			registry,
+		);
 	}
 }
