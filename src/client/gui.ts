@@ -1,7 +1,7 @@
 import Iris from "@rbxts/iris";
-import { toStr } from "../shared/impl/tostr";
-import { DbgItClient } from ".";
 import { ContextActionService } from "@rbxts/services";
+import { DbgItClient } from ".";
+import { toStr } from "../shared/impl/tostr";
 
 class IDbgItGui implements toStr {
 	protected _shown = Iris.State(false);
@@ -13,7 +13,7 @@ class IDbgItGui implements toStr {
 		protected readonly props: Props,
 		private readonly dbgit: typeof DbgItClient,
 	) {
-		Iris.Init();
+		if (props.initIris) Iris.Init();
 		Iris.Connect(() => {
 			Iris.Window(["Dbg-It!", false, false, false, true], { isOpened: this._shown });
 			// Executor
@@ -26,10 +26,7 @@ class IDbgItGui implements toStr {
 			Iris.End();
 
 			Iris.CollapsingHeader(["Logs"]);
-			this._logs
-				.filter((v, i) => i >= this._logs.size() - 50)
-				.sort((a, b) => a > b)
-				.forEach((v) => Iris.Text([v]));
+			this._logs.filter((v, i) => i >= this._logs.size() - 50).forEach((v) => Iris.Text([v]));
 			Iris.End();
 
 			Iris.End();
@@ -85,6 +82,7 @@ class IDbgItGui implements toStr {
 
 const DefaultProps: Props = {
 	keybinds: [],
+	initIris: true,
 };
 
 export function DbgItGui(props: Partial<Props>, dbgit: typeof DbgItClient): IGui {
@@ -94,4 +92,5 @@ export function DbgItGui(props: Partial<Props>, dbgit: typeof DbgItClient): IGui
 export type IGui = IDbgItGui;
 export interface Props {
 	keybinds: (Enum.KeyCode | Enum.UserInputType | Enum.PlayerActions)[];
+	initIris: boolean;
 }
