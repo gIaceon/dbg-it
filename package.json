@@ -5,7 +5,6 @@
   "main": "out/init.lua",
   "scripts": {
     "build": "rbxtsc",
-    "dev": "rbxtsc -w --type=game",
     "watch": "rbxtsc -w",
     "prepare": "rbxtsc"
   },
@@ -22,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gIaceon/dbg-it.git"
+    "url": "https://github.com/berry-blossom/dbg-it.git"
   },
   "devDependencies": {
     "@rbxts/compiler-types": "^2.3.0-types.0",
