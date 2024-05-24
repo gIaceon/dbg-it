@@ -17,6 +17,14 @@
 
 </div>
 
+# Installation
+
+Dbg-It! requires the use of [roblox-ts](https://roblox-ts.com/).
+
+From NPM *(recommended)*: `npm i @rbxts/dbg-it`
+
+From Github: `npm i git+https://github.com/berry-blossom/dbg-it.git`
+
 # Documentation
 No documentation is available yet, but you can check out some of the [built](src/shared/builtins.ts)-[ins](src/shared/builtinTypes.ts) for examples on creating commands or types.
 
