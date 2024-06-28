@@ -5,7 +5,7 @@ import { Kind } from "../kind";
 import { CommandContext } from "./context";
 
 export type CommandExecution<A extends defined, T extends [...defined[]] = [A]> =
-	| ((ctx: CommandContext<Command<A, T>>, ...args: T) => string | undefined | void)
+	| ((ctx: CommandContext<A, T>, ...args: T) => string | undefined | void)
 	| undefined;
 
 export type AnyCommand = ReadOnlyCommand<defined, [...defined[]]>;
