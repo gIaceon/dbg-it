@@ -10,6 +10,6 @@ export enum CommandSyntaxError {
 }
 
 export enum RegistryWarnings {
-	OVERWRITTEN = "Command %s was registered more than once and will be overwritten!",
-	ARGPRIORITY = 'Command string %s @ token "%s" had conflicting arguments! Consider using subcommands to elimate conflicts.',
+	OVERWRITTEN = 'Command "%s" was registered more than once and will be overwritten!',
+	ARGPRIORITY = 'Command "%s" @ token "%s" had conflicting arguments! Consider using subcommands to elimate conflicts.',
 }

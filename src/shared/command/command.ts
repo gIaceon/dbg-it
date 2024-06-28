@@ -29,15 +29,10 @@ export class ReadOnlyCommand<A extends defined, T extends [...defined[]] = [A]> 
 	}
 
 	/** @hidden */ public getExpectedArguments() {
-		return (
-			this.children
-				.array()
-				.reduce(
-					(accum, current, idx) =>
-						accum + current.cmd.argument.label + (idx - 1 >= this.children.array().size() ? "" : ", "),
-					"(",
-				) + ")"
-		);
+		return this.children
+			.array()
+			.mapFiltered((n) => n.cmd.argument.label)
+			.join("|");
 	}
 
 	/**
