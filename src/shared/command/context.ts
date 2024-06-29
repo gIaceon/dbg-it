@@ -1,3 +1,4 @@
+import { TokenStream } from "../token";
 import { ReadOnlyCommand } from "./command";
 import { CommandExecutor } from "./executor";
 
@@ -8,4 +9,8 @@ export class CommandContext<A extends defined, T extends [...defined[]] = define
 		public readonly commandString: string,
 		public readonly executor: CommandExecutor,
 	) {}
+
+	public tokens() {
+		return TokenStream.create(this.commandString);
+	}
 }

@@ -1,5 +1,5 @@
 import { t } from "@rbxts/t";
-import { tKind } from "../kind";
+import { Kind, tKind } from "../kind";
 
 export class StringKind extends tKind<string> {
 	public transform(data: string): string {
@@ -45,10 +45,24 @@ export class BooleanKind extends tKind<boolean> {
 
 export class LiteralKind<T extends string> extends tKind<T> {
 	public constructor(public readonly literal: T) {
-		super(`literal-${literal}`, t.literal(literal));
+		super(`"${literal}"`, t.literal(literal));
 	}
 	public transform(data: string): T | undefined {
 		if (this.check(data)) return data;
 		return undefined;
+	}
+}
+
+export class LiteralUnionKind<T extends string[]> extends Kind<T[number]> {
+	public readonly literal: T;
+	public constructor(...literal: T) {
+		super(`[${literal.mapFiltered((v) => `"${v}"`).join(" | ")}]`);
+		this.literal = literal;
+	}
+	public transform(data: string): T[number] | undefined {
+		return this.verify(data) ? data : undefined;
+	}
+	public verify(data: unknown): data is T[number] {
+		return this.literal.indexOf(tostring(data)) >= 0;
 	}
 }

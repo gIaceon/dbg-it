@@ -12,6 +12,12 @@ function isEscapeSequence(character: string) {
 	return escape !== undefined;
 }
 
+function isQuoteCharacter(character: string) {
+	const [quote] = character.match('["]');
+	const [squote] = character.match("[']");
+	return quote !== undefined || squote !== undefined;
+}
+
 export function tokenize(str: string): string[] {
 	// This approach I'm taking here completely different than the usual way you'd do things and I'd like to give my reasoning as to why.
 	//
@@ -32,6 +38,7 @@ export function tokenize(str: string): string[] {
 
 	let currentString = "";
 	let state = "WRITE" as TOKENIZE_STATE;
+	let escapeState = false;
 	let lastGraphemeStart = 0;
 	let lastGraphemeEnd = 0;
 
@@ -59,14 +66,14 @@ export function tokenize(str: string): string[] {
 		const currentCharacter = str.sub(graphemeStart, graphemeEnd);
 
 		// If the current character is whitespace and we aren't inside of a quote, we can add a new token.
-		if (isWhitespace(currentCharacter) && state !== "IN_QUOTE") {
+		if (isWhitespace(currentCharacter) && state !== "IN_QUOTE" && !escapeState) {
 			state = "FLUSH";
 			prepareNextGrapheme();
 			continue;
 		}
 
 		// If the current character is a quote, which is not escaped...
-		if ((currentCharacter === '"' ?? currentCharacter === "'") && !isEscapeSequence(lastGrapheme() ?? "")) {
+		if (isQuoteCharacter(currentCharacter) && !escapeState) {
 			// We are inside of a quote and have reached the end of it.
 			if (state === "IN_QUOTE") flushToken();
 			// We are outside of the quote and have reached the beginning of it.
@@ -75,13 +82,18 @@ export function tokenize(str: string): string[] {
 			continue;
 		}
 
+		// If the current character begins an escape sequence...
+		if (isEscapeSequence(currentCharacter)) {
+			// Correctly handles stacked escape sequences e.g. \\ will include the token "\"
+			escapeState = !escapeState;
+			prepareNextGrapheme(!escapeState ? currentCharacter : "");
+			continue;
+		}
+
+		escapeState = false;
 		prepareNextGrapheme(currentCharacter);
 	}
 
-	// TODO This may warrant an error at some point.
-	// if (state === "IN_QUOTE") {
-	// throw "Attempt to tokenize string failed due to unfinished quote!";
-	// }
 	flushToken();
 
 	return result;
